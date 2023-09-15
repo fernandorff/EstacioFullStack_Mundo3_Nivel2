@@ -95,6 +95,42 @@ CREATE INDEX movimento_FKIndex3 ON movimento(pessoa_id_pessoa);
 
 ###
 
+#### 1. Como são implementadas as diferentes cardinalidades, basicamente 1X1, 1XN ou NxN, em um banco de dados relacional?
+
+As diferentes cardinalidades são implementadas em um banco de dados relacional de acordo com as regras de normalização. As regras de normalização são um conjunto de princípios que ajudam a garantir a integridade e a consistência dos dados em um banco de dados relacional.
+
+- Cardinalidade 1X1
+
+A cardinalidade 1X1 é implementada em um banco de dados relacional fundindo as duas entidades envolvidas no relacionamento em uma única tabela. Isso ocorre porque cada elemento de uma entidade A se relaciona com um e somente um elemento de outra entidade B.
+
+- Cardinalidade 1XN ou N1
+
+A cardinalidade 1XN ou N1 é implementada em um banco de dados relacional adicionando uma chave estrangeira à tabela que possui cardinalidade mínima 1. A chave estrangeira é um atributo que faz referência à chave primária da tabela que possui cardinalidade máxima N.
+
+- Cardinalidade NXN
+
+A cardinalidade NXN é implementada em um banco de dados relacional criando uma nova entidade para armazenar dados das entidades que estão se relacionando inicialmente. Essa nova entidade é chamada de entidade associativa.
+
+###
+
+#### 2. Que tipo de relacionamento deve ser utilizado para representar o uso de herançaem bancos de dados relacionais?
+
+O tipo de relacionamento que deve ser utilizado para representar o uso de herança em bancos de dados relacionais é o relacionamento de supertipo/subtipo. Esse relacionamento é uma relação de generalização/especialização, onde uma entidade supertipo é um conjunto mais geral de entidades, e uma entidade subtipo é um conjunto mais específico de entidades.
+
+###
+
+#### 3. Como o SQL Server Management Studio permite a melhoria da produtividade nas tarefas relacionadas ao gerenciamento do banco de dados?
+
+
+O SSMS oferece uma variedade de recursos que podem ajudar os usuários a realizar tarefas de forma mais rápida e eficiente, incluindo:
+
+- Visualização e gerenciamento de dados: O SSMS fornece uma variedade de ferramentas para visualizar e gerenciar dados, incluindo tabelas, views, procedimentos armazenados e outros objetos de banco de dados.
+- Gerenciamento de banco de dados: O SSMS fornece uma variedade de ferramentas para gerenciar bancos de dados, incluindo criação, alteração e exclusão de bancos de dados, além de gerenciamento de usuários e permissões.
+- Gerenciamento de objetos: O SSMS fornece uma variedade de ferramentas para gerenciar objetos de banco de dados, incluindo criação, alteração e exclusão de objetos, além de gerenciamento de dependências.
+
+###
+
+
 #### 1. Quais as diferenças no uso de sequence e identity?
 
 A principal diferença entre eles é que sequence é um objeto de banco de dados, enquanto identity é uma propriedade de uma coluna.
