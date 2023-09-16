@@ -34,7 +34,7 @@ plataforma do SQL Server.
 
 - Tabelas relacionadas no DBDesigner
 
-![img.png](img.png)
+![image](https://github.com/fernandorff/EstacioFullStack_Mundo3_Nivel2/assets/101672271/db53575c-7be7-42e8-83a4-142a05518027)
 
 - Esquema de criação das tabelas do banco de dados
 
