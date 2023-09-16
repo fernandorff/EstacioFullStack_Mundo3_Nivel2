@@ -16,7 +16,7 @@
 
 ##
 
-### Título da Prática: Procedimento | Criando o Banco de Dados
+### Título da Prática:  1º Procedimento | Criando o Banco de Dados
 
 #### Objetivos da Prática:
 
@@ -31,6 +31,10 @@ plataforma do SQL Server.
 #### Códigos solicitados neste roteiro de aula:
 
 ###
+
+- Tabelas relacionadas no DBDesigner
+
+![img.png](img.png)
 
 - Esquema de criação das tabelas do banco de dados
 
@@ -89,7 +93,7 @@ CREATE INDEX movimento_FKIndex2 ON movimento(produto_id_produto);
 CREATE INDEX movimento_FKIndex3 ON movimento(pessoa_id_pessoa);
 ```
 
-##
+###
 
 ### Análise e Conclusão
 
@@ -130,6 +134,144 @@ O SSMS oferece uma variedade de recursos que podem ajudar os usuários a realiza
 
 ###
 
+#
+
+#
+
+### Título da Prática:  2º Procedimento | Alimentando a Base
+
+- Esquema de inserção de dados nas tabelas
+
+
+```
+-- 1. b. dados completos do usuario
+
+insert into usuario (login, senha)
+VALUES ('op1', 'op1'), ('op2', 'op2');
+
+
+-- 1. c. dados completos do produto
+
+insert into usuario (nome, quantidade, precoVenda)
+VALUES ('Banana', 100, 5.00), ('Laranja', 500, 2.00), ('Manga', 800, 4.00);
+
+
+-- 2. b. Incluir na tabela pessoa os dados comuns
+
+INSERT INTO pessoa (nome, logradouro, cidade, estado, telefone, email)
+VALUES 
+('João da Silva', 'Rua das Flores', 'São Paulo', 'SP', '11999999999', 'joao.silva@email.com'),
+('Maria da Silva', 'Rua dos Pinheiros', 'São Paulo', 'SP', '11999999999', 'maria.silva@email.com'),
+('Empresa XPTO', 'Rua dos Negócios', 'São Paulo', 'SP', '11999999999', 'empresa.xpto@email.com');
+
+
+-- 2. c. Incluir em pessoa física o CPF, efetuando o relacionamento com pessoa.
+
+INSERT INTO pessoa_fisica (pessoa_id_pessoa, cpf)
+VALUES (1, '12345678900'), (2, '98765432100');
+
+
+-- 2. d. Incluir em pessoa jurídica o CNPJ, relacionando com pessoa.
+
+INSERT INTO pessoa_juridica (pessoa_id_pessoa, cnpj)
+VALUES (3, '12345678000101');
+```
+
+- Esquema de buscas na tabelas
+
+```
+-- 4. a. Dados completos de pessoas físicas
+
+SELECT P.id_pessoa, P.nome, P.logradouro, P.cidade, P.estado, P.telefone, P.email, PF.cpf
+FROM Pessoa AS P 
+INNER JOIN pessoa_fisica AS PF ON P.id_pessoa = PF.id_pessoa;
+
+
+-- 4. b. Dados completos de pessoas jurídicas
+
+SELECT P.id_pessoa, P.nome, P.logradouro, P.cidade, P.estado, P.telefone, P.email, PJ.cnpj
+FROM Pessoa AS P
+INNER JOIN pessoa_juridica AS PJ ON P.id_pessoa = PJ.id_pessoa;
+
+
+-- 4. c. Movimentações de entrada, com produto, fornecedor, quantidade, preço unitário e valor total
+
+SELECT M.tipo AS tipo_movimentacao, P.nome AS Produto, F.nome AS Fornecedor, M.quantidade AS Quantidade, M.valor_unitario AS preco_unitario, (M.quantidade * M.valor_unitario) AS valor_total
+FROM Movimento AS M 
+INNER JOIN Pessoa AS F ON M.id_pessoa = F.id_pessoa
+INNER JOIN Produto AS P ON M.id_produto = P.id_produto
+WHERE M.tipo = 'E';
+
+
+-- 4. d. Movimentações de saída, com produto, comprador, quantidade, preço unitário e valor total
+
+SELECT M.tipo AS tipo_movimentacao, P.nome AS Produto, PF.nome AS Comprador, M.quantidade AS Quantidade, M.valor_unitario AS preco_unitario, (M.quantidade * M.valor_unitario) AS valor_total
+FROM Movimento AS M 
+INNER JOIN Pessoa AS PF ON M.id_pessoa = PF.id_pessoa
+INNER JOIN Produto AS P ON M.id_produto = P.id_produto
+WHERE M.tipo = 'S';
+
+
+-- 4. e. Valor total das entradas agrupadas por produto
+
+SELECT P.nome AS produto_entrada,
+    SUM(M.quantidade) AS quantidade_total,
+    SUM(M.quantidade * M.valor_unitario) AS valor_total
+FROM Movimento AS M 
+INNER JOIN Produto AS P ON M.id_produto = P.id_produto
+WHERE M.tipo = 'E'
+GROUP BY P.nome;
+
+
+-- 4. f. Valor total das saídas agrupadas por produto
+
+SELECT P.nome AS produto_saida,SUM(M.quantidade) AS quantidade_total, SUM(M.quantidade * M.valor_unitario) AS valor_total
+FROM Movimento AS M
+INNER JOIN Produto AS P ON M.id_produto = P.id_produto
+WHERE M.tipo = 'S'
+GROUP BY P.nome;
+
+
+-- 4. g. Operadores que não efetuaram movimentações de entrada (compra)
+
+SELECT U.login AS Operador
+FROM Usuario AS U
+WHERE NOT EXISTS (SELECT 1 FROM Movimento AS M WHERE M.Usuario_id_usuario = U.id_usuario AND M.tipo = 'E');
+
+
+-- 4. h. Valor total de entrada, agrupado por operador
+
+SELECT U.login AS operador_entrada, SUM(M.quantidade) AS quantidade_total, SUM(M.quantidade * M.valor_unitario) AS valor_total
+FROM Movimento AS M
+INNER JOIN Usuario AS U ON M.id_usuario = U.id_usuario
+WHERE M.tipo = 'E'
+GROUP BY U.login;
+
+
+-- 4. i. Valor total de saída, agrupado por operador
+
+SELECT U.login AS operador_saida, SUM(M.quantidade) AS quantidade_total, SUM(M.quantidade * M.valor_unitario) AS valor_total
+FROM Movimento AS M
+INNER JOIN Usuario AS U ON M.id_usuario = U.id_usuario
+WHERE M.tipo = 'S'
+GROUP BY U.login;
+
+
+-- 4. j. Valor médio de venda por produto, utilizando média ponderada
+
+SELECT P.nome AS produto_saida, SUM(M.quantidade) AS quantidade_total, SUM(M.quantidade * M.valor_unitario) / SUM(M.quantidade) AS valor_ponderado, SUM(M.quantidade * M.valor_unitario) AS valor_total
+FROM Movimento AS M
+INNER JOIN Pessoa AS PF ON M.id_pessoa = PF.id_pessoa
+INNER JOIN Produto AS P ON M.id_produto = P.id_produto
+WHERE M.tipo = 'S'
+GROUP BY P.nome;
+```
+
+##
+
+### Análise e Conclusão
+
+###
 
 #### 1. Quais as diferenças no uso de sequence e identity?
 
